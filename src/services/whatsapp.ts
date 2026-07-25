@@ -3241,53 +3241,42 @@ Link referensi: ${randomItem.link}` }, { quoted: msg });
         await this.sock.sendMessage(jid, { text: `⏳ *Membuat fake saldo ${cmd} dengan nominal Rp ${nominal}...*` }, { quoted: msg });
         
         try {
-            
-            
-            
+            const { Jimp, loadFont } = require('jimp');
+            const fonts = require('jimp/fonts');
+            const fs = require('fs');
+            const path = require('path');
             
             const templatePath = path.join(process.cwd(), 'public', 'templates', cmd + '.png');
             let buffer;
             
             if (fs.existsSync(templatePath)) {
-                const metadata = await sharp(templatePath).metadata();
-                const width = metadata.width || 1080;
-                const height = metadata.height || 1920;
-                
-                let textSvg = '';
+                const bg = await Jimp.read(templatePath);
                 
                 if (cmd === 'fakedana') {
-                    textSvg = `
-                        <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-                            <text x="160" y="195" font-family="sans-serif" font-size="36" fill="white">Rp</text>
-                            <text x="220" y="200" font-family="sans-serif" font-size="64" fill="white" font-weight="bold">${nominal}</text>
-                        </svg>
-                    `;
+                    const fontRp = await loadFont(fonts.SANS_32_WHITE);
+                    const fontNominal = await loadFont(fonts.SANS_64_WHITE);
+                    bg.print({ font: fontRp, x: 160, y: 195, text: "Rp" });
+                    bg.print({ font: fontNominal, x: 220, y: 175, text: nominal });
                 } else {
-                    let textColor = 'white';
-                    if (cmd === 'fakelivin') textColor = 'black';
+                    let isBlack = cmd === 'fakelivin';
+                    const fontRp = await loadFont(isBlack ? fonts.SANS_32_BLACK : fonts.SANS_32_WHITE);
+                    const fontNominal = await loadFont(isBlack ? fonts.SANS_64_BLACK : fonts.SANS_64_WHITE);
                     
-                    textSvg = `
-                        <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-                            <text x="100" y="240" font-family="sans-serif" font-size="40" fill="${textColor}">Rp</text>
-                            <text x="160" y="240" font-family="sans-serif" font-size="70" fill="${textColor}" font-weight="bold">${nominal}</text>
-                        </svg>
-                    `;
+                    bg.print({ font: fontRp, x: 100, y: 240, text: "Rp" });
+                    bg.print({ font: fontNominal, x: 160, y: 220, text: nominal });
                 }
                 
-                buffer = await sharp(templatePath)
-                    .composite([{ input: Buffer.from(textSvg), top: 0, left: 0 }])
-                    .png()
-                    .toBuffer();
+                buffer = await bg.getBuffer('image/png');
             } else {
-                const svgText = `
-                    <svg width="600" height="1200" xmlns="http://www.w3.org/2000/svg">
-                      <rect width="600" height="1200" fill="#118ee9"/>
-                      <text x="50%" y="30%" font-family="Arial" font-size="60" fill="white" text-anchor="middle" font-weight="bold">Fake ${cmd.replace('fake', '').toUpperCase()}</text>
-                      <text x="50%" y="40%" font-family="Arial" font-size="80" fill="white" text-anchor="middle" font-weight="bold">Rp ${nominal}</text>
-                      <text x="50%" y="50%" font-family="Arial" font-size="40" fill="white" text-anchor="middle">Template ${cmd}.png tidak ditemukan!</text>
-                    </svg>
-                `;
-                buffer = await sharp(Buffer.from(svgText)).png().toBuffer();
+                const bg = new Jimp({ width: 600, height: 1200, color: '#118ee9' });
+                const font = await loadFont(fonts.SANS_64_WHITE);
+                const fontSmall = await loadFont(fonts.SANS_32_WHITE);
+                
+                bg.print({ font: fontSmall, x: 50, y: 300, text: "Fake " + cmd.replace('fake', '').toUpperCase() });
+                bg.print({ font: font, x: 50, y: 400, text: "Rp " + nominal });
+                bg.print({ font: fontSmall, x: 50, y: 500, text: "Template " + cmd + ".png tidak ditemukan!" });
+                
+                buffer = await bg.getBuffer('image/png');
             }
             
             await this.sock.sendMessage(jid, { 
