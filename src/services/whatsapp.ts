@@ -3280,7 +3280,8 @@ Link referensi: ${randomItem.link}` }, { quoted: msg });
             }
             
             await this.sock.sendMessage(jid, { 
-                image: buffer, 
+                image: Buffer.from(buffer), 
+                mimetype: 'image/png',
                 caption: `✅ *Berhasil membuat ${cmd} dengan nominal Rp ${nominal}*` 
             }, { quoted: msg });
             this.broadcastState(`Responded to ${cmd} command`);
