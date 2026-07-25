@@ -340,7 +340,7 @@ export class WhatsAppBot {
                 await this.sock.sendMessage(id, { text: msgText, mentions: [participantJid] });
                 this.broadcastState(`Sent welcome message to ${participantJid}`);
               } catch (e: any) {
-                this.broadcastState(`Failed to send welcome message: ${e?.message || e}`);
+                console.error("Failed to send welcome message:", e);
               }
             }
           } else if (action === "remove" && settings.goodbyeEnabled && settings.goodbyeMessage) {
@@ -835,6 +835,7 @@ export class WhatsAppBot {
     const bokepCommands = ['.bokepmenu', 'bokepmenu', '.vidbokepindonesia', 'vidbokepindonesia', '.vidbokepmalaysia', 'vidbokepmalaysia', '.vidbokepjepang', 'vidbokepjepang', '.vidbokepchina', 'vidbokepchina', '.vidbokepamerika', 'vidbokepamerika'];
     const aiCommands = ['.aimenu', 'aimenu', '.midjourney', 'midjourney', '.grok', 'grok', '.imgai', 'imgai', '.bingimg', 'bingimg', '.nanobananaai', 'nanobananaai', '.hapusbgfoto', 'hapusbgfoto'];
     const cdramaCommands = ['.cdramamenu', 'cdramamenu', '.dramaromantis', 'dramaromantis', '.dramakomedi', 'dramakomedi', '.dramamisteri', 'dramamisteri', '.dramakerajaan', 'dramakerajaan', '.dramakeluarga', 'dramakeluarga', '.dramaperang', 'dramaperang', '.dramaxianxia', 'dramaxianxia', '.dramakriminal', 'dramakriminal', '.dramafantasi', 'dramafantasi'];
+    const fakemoneyCommands = ['.fakemoneymenu', 'fakemoneymenu', '.fakedana', 'fakedana', '.fakegopay', 'fakegopay', '.fakeseabank', 'fakeseabank', '.fakeovo', 'fakeovo', '.fakeshopeepay', 'fakeshopeepay', '.fakebrimo', 'fakebrimo', '.fakelivin', 'fakelivin'];
     
     if (ownerCommands.includes(requestedCmd) && !isOwner) {
       this.broadcastState(`Blocked non-owner from using ${requestedCmd}`);
@@ -859,7 +860,7 @@ export class WhatsAppBot {
 
     if (isMenuCmd) {
       const botName = this.customBotName || this.sock.user?.name || "Wabot Pro";
-      const totalFitur = ownerCommands.length + groupCommands.length + funCommands.length + margaCommands.length + videoCommands.length + stickerCommands.length + downloadCommands.length + kristenCommands.length + islamCommands.length + cecanCommands.length + primbonCommands.length + animeCommands.length + sertifikatCommands.length + rpgCommands.length + storeCommands.length + beritaCommands.length + sulapCommands.length + hentaiCommands.length + hantuCommands.length + posterCommands.length + coganCommands.length + toolsCommands.length + deviceCommands.length + tiketCommands.length + karyawanCommands.length + hewanCommands.length + bokepCommands.length + aiCommands.length + cdramaCommands.length;
+      const totalFitur = ownerCommands.length + groupCommands.length + funCommands.length + margaCommands.length + videoCommands.length + stickerCommands.length + downloadCommands.length + kristenCommands.length + islamCommands.length + cecanCommands.length + primbonCommands.length + animeCommands.length + sertifikatCommands.length + rpgCommands.length + storeCommands.length + beritaCommands.length + sulapCommands.length + hentaiCommands.length + hantuCommands.length + posterCommands.length + coganCommands.length + toolsCommands.length + deviceCommands.length + tiketCommands.length + karyawanCommands.length + hewanCommands.length + bokepCommands.length + aiCommands.length + cdramaCommands.length + fakemoneyCommands.length;
       
       const dateNow = new Date();
       const dateOptions: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Jakarta' };
@@ -913,6 +914,7 @@ ${readmore}
 │ .karyawanmenu
 │ .hewanmenu
 │ .cdramamenu
+│ .fakemoneymenu
 
 Ketik menu yang kamu inginkan.`;
       
@@ -2133,7 +2135,7 @@ Ketik menu yang kamu inginkan.`;
       this.broadcastState(`Deleted custom bot name`);
       await this.sock.sendMessage(jid, { text: `✅ Berhasil mereset nama bot ke default.` }, { quoted: msg });
     } else if (body === ".totalfitur" || body === "totalfitur") {
-      const totalFitur = ownerCommands.length + groupCommands.length + funCommands.length + margaCommands.length + videoCommands.length + stickerCommands.length + downloadCommands.length + kristenCommands.length + islamCommands.length + cecanCommands.length + primbonCommands.length + animeCommands.length + sertifikatCommands.length + rpgCommands.length + storeCommands.length + beritaCommands.length + sulapCommands.length + hentaiCommands.length + hantuCommands.length + posterCommands.length + coganCommands.length + toolsCommands.length + deviceCommands.length + tiketCommands.length + karyawanCommands.length + hewanCommands.length + bokepCommands.length + aiCommands.length + cdramaCommands.length;
+      const totalFitur = ownerCommands.length + groupCommands.length + funCommands.length + margaCommands.length + videoCommands.length + stickerCommands.length + downloadCommands.length + kristenCommands.length + islamCommands.length + cecanCommands.length + primbonCommands.length + animeCommands.length + sertifikatCommands.length + rpgCommands.length + storeCommands.length + beritaCommands.length + sulapCommands.length + hentaiCommands.length + hantuCommands.length + posterCommands.length + coganCommands.length + toolsCommands.length + deviceCommands.length + tiketCommands.length + karyawanCommands.length + hewanCommands.length + bokepCommands.length + aiCommands.length + cdramaCommands.length + fakemoneyCommands.length;
       await this.sock.sendMessage(jid, { text: `⚠️ *Total Fitur Bot* : ${totalFitur} Fitur` }, { quoted: msg });
     } else if (body.startsWith(".addprefix") || body.startsWith("addprefix")) {
       const text = messageContent.replace(/^\.?addprefix\s*/i, "").trim();
@@ -2800,6 +2802,7 @@ Ketik menu yang kamu inginkan.`;
 
 │ .midjourney <prompt>
 │ .grok <teks>
+
 │ .imgai <prompt>
 │ .bingimg <prompt>
 │ .nanobananaai <prompt>
@@ -2817,7 +2820,7 @@ Ketik menu yang kamu inginkan.`;
       await this.sock.sendMessage(jid, { text: bokepText }, { quoted: msg });
       this.broadcastState(`Responded to bokepmenu command`);
     
-    } else if ([".grok", "grok", ].includes(body.split(" ")[0].toLowerCase())) {
+    } else if ([".grok", "grok"].includes(body.split(" ")[0].toLowerCase())) {
       
       const args = body.split(" ");
       const cmd = args[0].replace(".", "").toLowerCase();
@@ -3219,10 +3222,85 @@ Link referensi: ${randomItem.link}` }, { quoted: msg });
            await this.sock.sendMessage(jid, { text: "❌ *Gagal mengambil poster.*" }, { quoted: msg });
         }
       }
+    } else if (body === "fakemoneymenu" || body === ".fakemoneymenu" || body === "fakemoney menu" || body === ".fakemoney menu") {
+      const fakemoneyText = `💸 *Fake Money Menu*\n\n│ .fakedana <nominal>\n│ .fakegopay <nominal>\n│ .fakeseabank <nominal>\n│ .fakeovo <nominal>\n│ .fakeshopeepay <nominal>\n│ .fakebrimo <nominal>\n│ .fakelivin <nominal>`;
+      await this.sock.sendMessage(jid, { text: fakemoneyText }, { quoted: msg });
+      this.broadcastState(`Responded to fakemoneymenu command`);
     } else if (body === "cdramamenu" || body === ".cdramamenu" || body === "cdrama menu" || body === ".cdrama menu") {
       const cdramaText = `🎭 *C-Drama Menu*\n\n│ .dramaromantis\n│ .dramakomedi\n│ .dramamisteri\n│ .dramakerajaan\n│ .dramakeluarga\n│ .dramaperang\n│ .dramaxianxia\n│ .dramakriminal\n│ .dramafantasi`;
       await this.sock.sendMessage(jid, { text: cdramaText }, { quoted: msg });
       this.broadcastState(`Responded to cdramamenu command`);
+
+    } else if (['.fakedana', 'fakedana', '.fakegopay', 'fakegopay', '.fakeseabank', 'fakeseabank', '.fakeovo', 'fakeovo', '.fakeshopeepay', 'fakeshopeepay', '.fakebrimo', 'fakebrimo', '.fakelivin', 'fakelivin'].includes(body.split(" ")[0].toLowerCase())) {
+        const cmd = body.split(" ")[0].toLowerCase().replace('.', '');
+        const nominal = body.split(" ").slice(1).join(" ");
+        if (!nominal) {
+            return await this.sock.sendMessage(jid, { text: `⚠️ *Gunakan format:* .${cmd} <nominal>\nContoh: .${cmd} 1.000.000` }, { quoted: msg });
+        }
+        
+        await this.sock.sendMessage(jid, { text: `⏳ *Membuat fake saldo ${cmd} dengan nominal Rp ${nominal}...*` }, { quoted: msg });
+        
+        try {
+            
+            
+            
+            
+            const templatePath = path.join(process.cwd(), 'public', 'templates', cmd + '.png');
+            let buffer;
+            
+            if (fs.existsSync(templatePath)) {
+                const metadata = await sharp(templatePath).metadata();
+                const width = metadata.width || 1080;
+                const height = metadata.height || 1920;
+                
+                let textSvg = '';
+                
+                if (cmd === 'fakedana') {
+                    textSvg = `
+                        <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="195" font-family="sans-serif" font-size="36" fill="white">Rp</text>
+                            <text x="220" y="200" font-family="sans-serif" font-size="64" fill="white" font-weight="bold">${nominal}</text>
+                        </svg>
+                    `;
+                } else {
+                    let textColor = 'white';
+                    if (cmd === 'fakelivin') textColor = 'black';
+                    
+                    textSvg = `
+                        <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+                            <text x="100" y="240" font-family="sans-serif" font-size="40" fill="${textColor}">Rp</text>
+                            <text x="160" y="240" font-family="sans-serif" font-size="70" fill="${textColor}" font-weight="bold">${nominal}</text>
+                        </svg>
+                    `;
+                }
+                
+                buffer = await sharp(templatePath)
+                    .composite([{ input: Buffer.from(textSvg), top: 0, left: 0 }])
+                    .png()
+                    .toBuffer();
+            } else {
+                const svgText = `
+                    <svg width="600" height="1200" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="600" height="1200" fill="#118ee9"/>
+                      <text x="50%" y="30%" font-family="Arial" font-size="60" fill="white" text-anchor="middle" font-weight="bold">Fake ${cmd.replace('fake', '').toUpperCase()}</text>
+                      <text x="50%" y="40%" font-family="Arial" font-size="80" fill="white" text-anchor="middle" font-weight="bold">Rp ${nominal}</text>
+                      <text x="50%" y="50%" font-family="Arial" font-size="40" fill="white" text-anchor="middle">Template ${cmd}.png tidak ditemukan!</text>
+                    </svg>
+                `;
+                buffer = await sharp(Buffer.from(svgText)).png().toBuffer();
+            }
+            
+            await this.sock.sendMessage(jid, { 
+                image: buffer, 
+                caption: `✅ *Berhasil membuat ${cmd} dengan nominal Rp ${nominal}*` 
+            }, { quoted: msg });
+            this.broadcastState(`Responded to ${cmd} command`);
+            
+        } catch (e: any) {
+            console.error(e);
+            await this.sock.sendMessage(jid, { text: `❌ *Gagal membuat gambar ${cmd}*\nDetail: ${e.message}` }, { quoted: msg });
+        }
+
     } else if (body === "hewanmenu" || body === ".hewanmenu" || body === "hewan menu" || body === ".hewan menu") {
       const hewanText = `🐾 *Hewan Menu*\n\n│ .catcanvas\n│ .dogcanvas\n│ .foxcanvas\n│ .wolfcanvas\n│ .lioncanvas\n│ .tigercanvas\n│ .pandacanvas\n│ .bunnycanvas\n│ .owlcanvas\n│ .eaglecanvas\n│ .capycanvas\n│ .penguincanvas`;
       await this.sock.sendMessage(jid, { text: hewanText }, { quoted: msg });
