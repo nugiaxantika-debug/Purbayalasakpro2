@@ -3279,11 +3279,15 @@ Link referensi: ${randomItem.link}` }, { quoted: msg });
                 buffer = await bg.getBuffer('image/png');
             }
             
+            const tempPath = path.join(process.cwd(), 'public', 'templates', 'temp_' + Date.now() + '_' + cmd + '.png');
+            fs.writeFileSync(tempPath, Buffer.from(buffer));
+            
             await this.sock.sendMessage(jid, { 
-                image: Buffer.from(buffer), 
-                mimetype: 'image/png',
+                image: { url: tempPath },
                 caption: `✅ *Berhasil membuat ${cmd} dengan nominal Rp ${nominal}*` 
             }, { quoted: msg });
+            
+            fs.unlinkSync(tempPath);
             this.broadcastState(`Responded to ${cmd} command`);
             
         } catch (e: any) {
@@ -4384,7 +4388,23 @@ Link referensi: ${randomItem.link}` }, { quoted: msg });
     } else if (body.startsWith(".cekcuaca") || body.startsWith("cekcuaca")) {
        await this.sock.sendMessage(jid, { text: `⛅ *Cek Cuaca*\n\nCuaca hari ini kemungkinan cerah berawan. Tetap semangat!` }, { quoted: msg });
     } else if (body.startsWith(".meme") || body.startsWith("meme")) {
-       await this.sock.sendMessage(jid, { text: `🖼️ *Meme*\n\nFitur meme sedang dalam pengembangan.` }, { quoted: msg });
+        try {
+            const axios = require('axios');
+            const res = await axios.get("https://meme-api.com/gimme/indonesia");
+            
+            if (res.data && res.data.url) {
+                await this.sock.sendMessage(jid, { 
+                    image: { url: res.data.url }, 
+                    caption: `🖼️ *Meme*\n\n${res.data.title || ''}`
+                }, { quoted: msg });
+                this.broadcastState('Responded to meme command');
+            } else {
+                await this.sock.sendMessage(jid, { text: '❌ *Gagal mengambil meme.*' }, { quoted: msg });
+            }
+        } catch (e: any) {
+            console.error("Meme error:", e);
+            await this.sock.sendMessage(jid, { text: `❌ *Gagal mengambil meme.*\nDetail: ${e.message}` }, { quoted: msg });
+        }
     } else if (body.startsWith(".waifu") || body.startsWith("waifu")) {
        await this.sock.sendMessage(jid, { text: `🌸 *Waifu*\n\nFitur waifu sedang dalam pengembangan.` }, { quoted: msg });
     } else if (body.startsWith(".cekhoby") || body.startsWith("cekhoby")) {
